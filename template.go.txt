@@ -1,0 +1,421 @@
+package demo
+
+import (
+	"database/sql"
+	"fmt"
+	"sort"
+	"time"
+
+	"github.com/ebisol/api/app/logger"
+	_ "github.com/lib/pq"
+)
+
+var db *sql.DB
+
+func init() {
+	var err error
+	db, err = sql.Open("postgres", "host=localhost port=5433 user=ciao password=Kir0#alpha dbname=postgres sslmode=disable")
+	if err != nil {
+		logger.StackLogger(err)
+		panic(err)
+	}
+}
+
+// GetDB
+func (a *TableCreateDemo) GetDB() *sql.DB {
+	return db
+}
+
+// TableCreateDemo is the model for table table_create_demo
+type TableCreateDemo struct {
+	[model_str]
+}
+
+// TableCreateDemoCollection ...
+type TableCreateDemoCollection []*TableCreateDemo
+
+// SelectXCore is a auto generate method for select data from TableCreateDemo table
+func (a *TableCreateDemo) SelectXCore(tx *sql.Tx, query string, args ...interface{}) ([]*TableCreateDemo, error) {
+	var insArr []*TableCreateDemo
+	var rows *sql.Rows
+	var err error
+	if (args != nil) && (!(len(args) == 1 && args[0] == nil)) {
+		if tx != nil {
+			rows, err = tx.Query(query, args...)
+		} else {
+			rows, err = db.Query(query, args...)
+		}
+		if err != nil {
+			logger.StackLogger(err)
+			return nil, err
+		}
+	} else {
+		if tx != nil {
+			rows, err = tx.Query(query)
+		} else {
+			rows, err = db.Query(query)
+		}
+		if err != nil {
+			logger.StackLogger(err)
+			return nil, err
+		}
+	}
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			item := TableCreateDemo{}
+			err := rows.Scan([selectx_rowscan_str])
+			if err != nil {
+				logger.StackLogger(err)
+				return nil, err
+			}
+			insArr = append(insArr, &item)
+		}
+		err = rows.Err()
+		if err != nil {
+			logger.StackLogger(err)
+			return nil, err
+		}
+	}
+	return insArr, nil
+}
+
+// InsertCore ...
+func (a *TableCreateDemo) InsertCore(tx *sql.Tx, item TableCreateDemo) (int, error) {
+	var lastInsertID int
+	var err error
+	query := `INSERT INTO table_create_demo [insert_query_str] returning id;`
+	if tx != nil {
+		err = tx.QueryRow(query, [insert_queryrow_str]).Scan(&lastInsertID)
+	} else {
+		err = db.QueryRow(query, [insert_queryrow_str]).Scan(&lastInsertID)
+	}
+	if err != nil {
+		logger.StackLogger(err)
+		return 0, err
+	}
+	return lastInsertID, nil
+}
+
+// UpdateCore ...
+func (a *TableCreateDemo) UpdateCore(tx *sql.Tx, i int, item TableCreateDemo) error {
+	query := `
+	UPDATE table_create_demo
+	SET [update_query_str]
+	WHERE id = $1`
+	var res sql.Result
+	var err error
+	if tx != nil {
+		res, err = tx.Exec(query, i, [insert_queryrow_str])
+	} else {
+		res, err = db.Exec(query, i, [insert_queryrow_str])
+	}
+	if err != nil {
+		logger.StackLogger(err)
+		return err
+	}
+	return a.RowChangeCheck(i, res)
+}
+
+// DeleteCore ...
+func (a *TableCreateDemo) DeleteCore(tx *sql.Tx, i int) error {
+	query := `
+		DELETE FROM table_create_demo
+		WHERE id = $1`
+	var res sql.Result
+	var err error
+	if tx != nil {
+		res, err = tx.Exec(query, i)
+	} else {
+		res, err = db.Exec(query, i)
+	}
+	if err != nil {
+		logger.StackLogger(err)
+		return err
+	}
+	return a.RowChangeCheck(i, res)
+}
+
+// SelectX is a auto generate method for select data from TableCreateDemo table
+func (a *TableCreateDemo) SelectX(query string) ([]*TableCreateDemo, error) {
+	return a.SelectXCore(nil, query, nil)
+}
+
+// SelectXwithArgs is a auto generate method for select data from TableCreateDemo table
+func (a *TableCreateDemo) SelectXwithArgs(query string, args ...interface{}) ([]*TableCreateDemo, error) {
+	return a.SelectXCore(nil, query, args...)
+}
+
+// SelectXwithTransc is a auto generate method for select data from TableCreateDemo table
+func (a *TableCreateDemo) SelectXwithTransc(tx *sql.Tx, query string) ([]*TableCreateDemo, error) {
+	return a.SelectXCore(tx, query, nil)
+}
+
+// SelectXwithTranscwithArgs is a auto generate method for select data from TableCreateDemo table
+func (a *TableCreateDemo) SelectXwithTranscwithArgs(tx *sql.Tx, query string, args ...interface{}) ([]*TableCreateDemo, error) {
+	return a.SelectXCore(tx, query, args...)
+}
+
+// CountX is a auto generate method for count data in TableCreateDemo table
+func (a *TableCreateDemo) CountX(query string) (int, error) {
+	count := 0
+	err := db.QueryRow(query).Scan(&count)
+	if err != nil {
+		logger.StackLogger(err)
+		return 0, err
+	}
+	return count, nil
+}
+
+// Insert ...
+func (a *TableCreateDemo) Insert(item TableCreateDemo) (int, error) {
+	return a.InsertCore(nil, item)
+}
+
+// InsertwithTransc ...
+func (a *TableCreateDemo) InsertwithTransc(tx *sql.Tx, item TableCreateDemo) (int, error) {
+	return a.InsertCore(tx, item)
+}
+
+// Update ...
+func (a *TableCreateDemo) Update(i int, item TableCreateDemo) error {
+	return a.UpdateCore(nil, i, item)
+}
+
+// UpdatewithTransc ...
+func (a *TableCreateDemo) UpdatewithTransc(tx *sql.Tx, i int, item TableCreateDemo) error {
+	return a.UpdateCore(tx, i, item)
+}
+
+// Delete ...
+func (a *TableCreateDemo) Delete(i int) error {
+	return a.DeleteCore(nil, i)
+}
+
+// DeletewithTransc ...
+func (a *TableCreateDemo) DeletewithTransc(tx *sql.Tx, i int) error {
+	return a.DeleteCore(tx, i)
+}
+
+// RowChangeCheck is for update and delete, check the affected rows been affected
+func (a *TableCreateDemo) RowChangeCheck(i int, res sql.Result) error {
+	if res != nil {
+		affect, err := res.RowsAffected()
+		if err != nil {
+			logger.StackLogger(err)
+			return err
+		}
+		switch affect {
+		case 0:
+			return fmt.Errorf("%v rows changed, id = %v does not exist", affect, i)
+		case 1:
+			return nil
+		default:
+			return fmt.Errorf("%v rows changed", affect)
+		}
+	} else {
+		return fmt.Errorf("res is nil, id = %v", i)
+	}
+}
+
+// Wrapper ...
+func (a *TableCreateDemo) Wrapper(item TableCreateDemo) (newitem TableCreateDemo) {
+	[wrapper_str]
+	return newitem
+}
+
+func typeCompareFunc(p1, p2 interface{}, orderstr string) bool {
+	if orderstr == "desc" {
+		switch p1.(type) {
+		case bool:
+			if p1.(bool) == true && p2.(bool) == false {
+				return true
+			}
+			return false
+		case int:
+			return p1.(int) > p2.(int)
+		case int64:
+			return p1.(int64) > p2.(int64)
+		case float32:
+			return p1.(float32) > p2.(float32)
+		case float64:
+			return p1.(float64) > p2.(float64)
+		case string:
+			return p1.(string) > p1.(string)
+		case time.Time:
+			return (p1.(time.Time)).After(p2.(time.Time))
+		case *bool:
+			if p1 != (*bool)(nil) && p2 != (*bool)(nil) {
+				if *p1.(*bool) == true && *p2.(*bool) == false {
+					return true
+				}
+			} else if p1 != (*bool)(nil) && p2 == (*bool)(nil) {
+				return true
+			}
+			return false
+		case *int:
+			if p1 != (*int)(nil) && p2 != (*int)(nil) {
+				return *p1.(*int) > *p2.(*int)
+			} else if p1 != (*int)(nil) && p2 == (*int)(nil) {
+				return true
+			}
+			return false
+		case *int64:
+			if p1 != (*int64)(nil) && p2 != (*int64)(nil) {
+				return *p1.(*int64) > *p2.(*int64)
+			} else if p1 != (*int64)(nil) && p2 == (*int64)(nil) {
+				return true
+			}
+			return false
+		case *float32:
+			if p1 != (*float32)(nil) && p2 != (*float32)(nil) {
+				return *p1.(*float32) > *p2.(*float32)
+			} else if p1 != (*float32)(nil) && p2 == (*float32)(nil) {
+				return true
+			}
+			return false
+		case *float64:
+			if p1 != (*float64)(nil) && p2 != (*float64)(nil) {
+				return *p1.(*float64) > *p2.(*float64)
+			} else if p1 != (*float64)(nil) && p2 == (*float64)(nil) {
+				return true
+			}
+			return false
+		case *string:
+			if p1 != (*string)(nil) && p2 != (*string)(nil) {
+				return *p1.(*string) > *p2.(*string)
+			} else if p1 != (*string)(nil) && p2 == (*string)(nil) {
+				return true
+			}
+			return false
+		case *time.Time:
+			if p1 != (*time.Time)(nil) && p2 != (*time.Time)(nil) {
+				return (*p1.(*time.Time)).After(*p2.(*time.Time))
+			} else if p1 != (*time.Time)(nil) && p2 == (*time.Time)(nil) {
+				return true
+			}
+			return false
+		default:
+			return false
+		}
+	} else {
+		switch p1.(type) {
+		case bool:
+			if p1.(bool) == true && p2.(bool) == false {
+				return false
+			}
+			return true
+		case int:
+			return p1.(int) < p2.(int)
+		case int64:
+			return p1.(int64) < p2.(int64)
+		case float32:
+			return p1.(float32) < p2.(float32)
+		case float64:
+			return p1.(float64) < p2.(float64)
+		case string:
+			return p1.(string) < p1.(string)
+		case time.Time:
+			return (p1.(time.Time)).Before(p2.(time.Time))
+		case *bool:
+			if p1 != (*bool)(nil) && p2 != (*bool)(nil) {
+				if *p1.(*bool) == false && *p2.(*bool) == true {
+					return true
+				}
+			} else if p1 != (*bool)(nil) && p2 == (*bool)(nil) {
+				return true
+			}
+			return false
+		case *int:
+			if p1 != (*int)(nil) && p2 != (*int)(nil) {
+				return *p1.(*int) < *p2.(*int)
+			} else if p1 != (*int)(nil) && p2 == (*int)(nil) {
+				return true
+			}
+			return false
+		case *int64:
+			if p1 != (*int64)(nil) && p2 != (*int64)(nil) {
+				return *p1.(*int64) < *p2.(*int64)
+			} else if p1 != (*int64)(nil) && p2 == (*int64)(nil) {
+				return true
+			}
+			return false
+		case *float32:
+			if p1 != (*float32)(nil) && p2 != (*float32)(nil) {
+				return *p1.(*float32) < *p2.(*float32)
+			} else if p1 != (*float32)(nil) && p2 == (*float32)(nil) {
+				return true
+			}
+			return false
+		case *float64:
+			if p1 != (*float64)(nil) && p2 != (*float64)(nil) {
+				return *p1.(*float64) < *p2.(*float64)
+			} else if p1 != (*float64)(nil) && p2 == (*float64)(nil) {
+				return true
+			}
+			return false
+		case *string:
+			if p1 != (*string)(nil) && p2 != (*string)(nil) {
+				return *p1.(*string) < *p2.(*string)
+			} else if p1 != (*string)(nil) && p2 == (*string)(nil) {
+				return true
+			}
+			return false
+		case *time.Time:
+			if p1 != (*time.Time)(nil) && p2 != (*time.Time)(nil) {
+				return (*p1.(*time.Time)).Before(*p2.(*time.Time))
+			} else if p1 != (*time.Time)(nil) && p2 == (*time.Time)(nil) {
+				return true
+			}
+			return false
+		default:
+			return false
+		}
+	}
+}
+
+// SortBy ...
+func (c TableCreateDemoCollection) SortBy(columnName string, orderstr string) error {
+	if orderstr != "asc" && orderstr != "desc" {
+		return fmt.Errorf("not supported order keyword: %v", orderstr)
+	}
+	comparedFunc := func(p1, p2 *TableCreateDemo) bool {
+		[sortby_comparedfunc_str]
+		return typeCompareFunc(p1.ID, p2.ID, orderstr)
+	}
+	TableCreateDemoBy(comparedFunc).Sort(c)
+	return nil
+}
+
+// TableCreateDemoBy is the type of a "less" function that defines the ordering of its Planet arguments.
+type TableCreateDemoBy func(p1, p2 *TableCreateDemo) bool
+
+// Sort is a method on the function type, By, that sorts the argument slice according to the function.
+func (by TableCreateDemoBy) Sort(tableCreateDemos []*TableCreateDemo) {
+	ps := &tableCreateDemoSorter{
+		tableCreateDemos: tableCreateDemos,
+		by:               by, // The Sort method's receiver is the function (closure) that defines the sort order.
+	}
+	sort.Sort(ps)
+}
+
+// tableCreateDemoSorter joins a By function and a slice of Planets to be sorted.
+type tableCreateDemoSorter struct {
+	tableCreateDemos []*TableCreateDemo
+	by               func(p1, p2 *TableCreateDemo) bool // Closure used in the Less method.
+}
+
+// Len is part of sort.Interface.
+func (s *tableCreateDemoSorter) Len() int {
+	return len(s.tableCreateDemos)
+}
+
+// Swap is part of sort.Interface.
+func (s *tableCreateDemoSorter) Swap(i, j int) {
+	s.tableCreateDemos[i], s.tableCreateDemos[j] = s.tableCreateDemos[j], s.tableCreateDemos[i]
+}
+
+// Less is part of sort.Interface. It is implemented by calling the "by" closure in the sorter.
+func (s *tableCreateDemoSorter) Less(i, j int) bool {
+	return s.by(s.tableCreateDemos[i], s.tableCreateDemos[j])
+}

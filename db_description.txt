@@ -1,0 +1,33 @@
+//自動創建所有存取必須Func，基本排序，Wrapper，Interface和Mock
+[Create Start]
+CREATE TABLE table_create_demo (
+  id SERIAL PRIMARY KEY,
+  int_demo int NOT NULL,
+  text_demo text NOT NULL DEFAULT '',
+  bool_demo bool NOT NULL,
+  float_demo FLOAT8 NOT NULL,
+  timestamp_demo timestamp NOT NULL,
+  timestamp_demo_null timestamp
+);
+[Create End]
+
+//搭配Func Name和Return格式自動生成Code
+SELECT * FROM table_create_demo
+
+//搭配Func Name和Return格式自動生成Code，允許部分null
+SELECT id, int_demo, text_demo FROM table_create_demo
+
+//搭配Func Name和Return格式自動生成Code，自動創建帶有篩選條件當變數的Func，並且條件會被自動拆分來適應傳入值為預設值想要Skip該條件的狀況
+SELECT id, int_demo, text_demo FROM table_create_demo WHERE bool_demo = True
+
+//Func可訂Return物件是Array或單一Obj，Array有三種可能結果nil, {}, [], 單一Obj有兩個結果nil and Obj
+
+//自動創造新struct容納Select的結果
+SELECT
+  column1,
+  column2 AS table1_column2_alias,
+  table2.column1 AS table2_column1_alias,
+  table2.column2 AS table2_column2_alias
+FROM table1
+LEFT OUTER JOIN table2
+  ON table1.column1 = table2.column2
