@@ -98,7 +98,8 @@ def wrapper_str(items):
 def sortby_comparedfunc_str(items):
     return ' else '.join(["""if columnName == "{0}" {{
         return typeCompareFunc(p1.{1}, p2.{1}, orderstr)
-    }}""".format(v.column_name, v.attribute_name) for v in items])
+    }}""".format(v.column_name, v.attribute_name) for v in items
+        if v.attribute_name != 'ID'])
 
 
 alltxt = open("db_description.txt").read().lower()
