@@ -1,0 +1,10 @@
+func (a *TableCreateDemo) [func_name_str]([func_para_str]) ([func_return_para_str], error) {
+	querystr := "[func_query_str]"
+    [func_query_para_str]
+	insArr, err := a.SelectX(querystr)
+	if err != nil {
+		logger.StackLogger(err)
+		return nil, err
+	}
+	[func_return_str]
+}

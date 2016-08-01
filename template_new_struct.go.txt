@@ -1,0 +1,38 @@
+// NewStructMethodModel is the model for table table_create_demo
+type NewStructMethodModel struct {
+	[model_str]
+}
+
+// [function_name] is a auto generate method for SQL query [query]
+func (a *TableCreateDemo) [function_name](tx *sql.Tx) ([]*NewStructMethodModel, error) {
+	var insArr []*NewStructMethodModel
+	var rows *sql.Rows
+	var err error
+	if tx != nil {
+		rows, err = tx.Query("[query]")
+	} else {
+		rows, err = db.Query("[query]")
+	}
+	if err != nil {
+		logger.StackLogger(err)
+		return nil, err
+	}
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			item := NewStructMethodModel{}
+			err := rows.Scan([selectx_rowscan_str])
+			if err != nil {
+				logger.StackLogger(err)
+				return nil, err
+			}
+			insArr = append(insArr, &item)
+		}
+		err = rows.Err()
+		if err != nil {
+			logger.StackLogger(err)
+			return nil, err
+		}
+	}
+	return insArr, nil
+}

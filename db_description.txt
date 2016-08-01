@@ -7,27 +7,55 @@ CREATE TABLE table_create_demo (
   bool_demo bool NOT NULL,
   float_demo FLOAT8 NOT NULL,
   timestamp_demo timestamp NOT NULL,
+  int_demo_null int,
+  text_demo_null text,
+  bool_demo_null bool,
+  float_demo_null float8,
   timestamp_demo_null timestamp
 );
 [Create End]
 
+
+
 //搭配Func Name和Return格式自動生成Code
-SELECT * FROM table_create_demo
-
-//搭配Func Name和Return格式自動生成Code，允許部分null
-SELECT id, int_demo, text_demo FROM table_create_demo
-
-//搭配Func Name和Return格式自動生成Code，自動創建帶有篩選條件當變數的Func，並且條件會被自動拆分來適應傳入值為預設值想要Skip該條件的狀況
-SELECT id, int_demo, text_demo FROM table_create_demo WHERE bool_demo = True
-
+//搭配Func Name和Return格式自動生成Code，用原本的model，只是沒有select出來的就用預設值
 //Func可訂Return物件是Array或單一Obj，Array有三種可能結果nil, {}, [], 單一Obj有兩個結果nil and Obj
+//搭配Func Name和Return格式自動生成Code，自動創建帶有篩選條件當變數的Func，並且條件會被自動拆分來適應傳入值為預設值想要Skip該條件的狀況
+//不支援括號，不可or and混用，不支援in()運算式
+[Function Start]
+[
+    {
+        "name": "select_all",
+        "query": "SELECT * FROM table_create_demo",
+        "return": "array"
+    },
+    {
+        "name": "select_akabane",
+        "query": "SELECT * FROM table_create_demo WHERE text_demo = '赤羽信之介' or id = 1 ",
+        "return": "struct"
+    },
+    {
+        "name": "select_by_name_or_id_with_bool_false",
+        "query": "SELECT * FROM table_create_demo WHERE text_demo = %v or id = %v or bool_demo = false",
+        "return": "struct"
+    },
+    {
+        "name": "select_all_tiny",
+        "query": "SELECT id, int_demo, text_demo FROM table_create_demo",
+        "return": "array"
+    }
+]
+[Function End]
+
 
 //自動創造新struct容納Select的結果
-SELECT
-  column1,
-  column2 AS table1_column2_alias,
-  table2.column1 AS table2_column1_alias,
-  table2.column2 AS table2_column2_alias
-FROM table1
-LEFT OUTER JOIN table2
-  ON table1.column1 = table2.column2
+[New Struct Function Start]
+[
+    {
+        "function_name": "test_new_struct_select",
+        "struct_name": "new_struct_select",
+        "query": "SELECT int_demo, text_demo, table_create_demo_two.int_demo AS two_int, table_create_demo_two.text_demo AS two_text FROM table_create_demo INNER JOIN table_create_demo_two ON table_create_demo.int_demo = table_create_demo_two.int_demo",
+        "data_type": "int_demo: int; text_demo: string; two_int: int; two_text:string"
+    }
+]
+[New Struct Function End]

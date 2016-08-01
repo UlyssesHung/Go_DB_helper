@@ -1,0 +1,35 @@
+func (a *TableCreateDemo) [func_name_str](tx *sql.Tx[tx_comma] [func_para_str]) ([func_return_para_str], error) {
+	var insArr []*TableCreateDemo
+	var rows *sql.Rows
+	var err error
+	querystr := "[func_query_str]"
+	[func_query_para_str]
+	if tx != nil {
+		rows, err = tx.Query(querystr)
+	} else {
+		rows, err = db.Query(querystr)
+	}
+	if err != nil {
+		logger.StackLogger(err)
+		return nil, err
+	}
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			item := TableCreateDemo{}
+			// replacable
+			err := rows.Scan([selectx_rowscan_str])
+			if err != nil {
+				logger.StackLogger(err)
+				return nil, err
+			}
+			insArr = append(insArr, &item)
+		}
+		err = rows.Err()
+		if err != nil {
+			logger.StackLogger(err)
+			return nil, err
+		}
+	}
+	[func_return_str]
+}
