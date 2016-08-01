@@ -595,7 +595,7 @@ type NewStructSelect struct {
 }
 
 // TestNewStructSelect is a auto generate method for SQL query select int_demo, text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo
-func (a *NewStructSelect) TestNewStructSelect(tx *sql.Tx) ([]*NewStructSelect, error) {
+func (a *TableCreateDemo) TestNewStructSelect(tx *sql.Tx) ([]*NewStructSelect, error) {
 	var insArr []*NewStructSelect
 	var rows *sql.Rows
 	var err error
