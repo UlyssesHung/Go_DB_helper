@@ -54,7 +54,7 @@ CREATE TABLE table_create_demo (
     {
         "function_name": "test_new_struct_select",
         "struct_name": "new_struct_select",
-        "query": "SELECT int_demo, text_demo, table_create_demo_two.int_demo AS two_int, table_create_demo_two.text_demo AS two_text FROM table_create_demo INNER JOIN table_create_demo_two ON table_create_demo.int_demo = table_create_demo_two.int_demo",
+        "query": "SELECT table_create_demo.int_demo as int_demo, table_create_demo.text_demo as text_demo, table_create_demo_two.int_demo AS two_int, table_create_demo_two.text_demo AS two_text FROM table_create_demo INNER JOIN table_create_demo_two ON table_create_demo.int_demo = table_create_demo_two.int_demo",
         "data_type": "int_demo: int; text_demo: string; two_int: int; two_text:string"
     }
 ]

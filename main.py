@@ -106,6 +106,11 @@ def sortby_comparedfunc_str(items):
         if v.attribute_name != 'ID'])
 
 
+def sortby_comparedfunc_str_default(items, i):
+    return "return typeCompareFunc(p1.{1}, p2.{1}, orderstr)".format(
+        items[i].column_name, items[i].attribute_name)
+
+
 # don't support 'in' and '()' as a function parameter
 def complex_where_str(column_dic, where_str):
     quiterias = re.findall(r'([a-z|\_]+\s*(?:\!\=|\=|\<\>)\s*\S+)', where_str)
@@ -280,9 +285,15 @@ tpltnstrtext = tpltnstrtext.replace("TableCreateDemo", modelname)
 tpltnstrtext = tpltnstrtext.replace("[query]", function_query)
 tpltnstrtext = tpltnstrtext.replace("[function_name]", function_name)
 tpltnstrtext = tpltnstrtext.replace("NewStructMethodModel", struct_name)
+tpltnstrtext = tpltnstrtext.replace("newStructMethodModel", struct_name[
+    0].lower() + struct_name[1:])
 tpltnstrtext = tpltnstrtext.replace("[model_str]", model_str(nst_column_items))
 tpltnstrtext = tpltnstrtext.replace("[selectx_rowscan_str]", ','.join(
     ['&item.{0}'.format(v.attribute_name) for v in nst_column_items]))
+tpltnstrtext = tpltnstrtext.replace("[sortby_comparedfunc_str]",
+                                    sortby_comparedfunc_str(nst_column_items))
+tpltnstrtext = tpltnstrtext.replace("[sortby_comparedfunc_str_default]",
+                                    sortby_comparedfunc_str_default(nst_column_items, 0))
 open('result.go', 'a').write(tpltnstrtext)
 # TODO: sorting method of new structure
 

@@ -594,15 +594,15 @@ type NewStructSelect struct {
 	TwoText  string `json:"two_text"`
 }
 
-// TestNewStructSelect is a auto generate method for SQL query select int_demo, text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo
+// TestNewStructSelect is a auto generate method for SQL query select table_create_demo.int_demo as int_demo, table_create_demo.text_demo as text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo
 func (a *TableCreateDemo) TestNewStructSelect(tx *sql.Tx) ([]*NewStructSelect, error) {
 	var insArr []*NewStructSelect
 	var rows *sql.Rows
 	var err error
 	if tx != nil {
-		rows, err = tx.Query("select int_demo, text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo")
+		rows, err = tx.Query("select table_create_demo.int_demo as int_demo, table_create_demo.text_demo as text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo")
 	} else {
-		rows, err = db.Query("select int_demo, text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo")
+		rows, err = db.Query("select table_create_demo.int_demo as int_demo, table_create_demo.text_demo as text_demo, table_create_demo_two.int_demo as two_int, table_create_demo_two.text_demo as two_text from table_create_demo inner join table_create_demo_two on table_create_demo.int_demo = table_create_demo_two.int_demo")
 	}
 	if err != nil {
 		logger.StackLogger(err)
@@ -626,4 +626,61 @@ func (a *TableCreateDemo) TestNewStructSelect(tx *sql.Tx) ([]*NewStructSelect, e
 		}
 	}
 	return insArr, nil
+}
+
+// NewStructSelectCollection ...
+type NewStructSelectCollection []*NewStructSelect
+
+// SortBy ...
+func (c NewStructSelectCollection) SortBy(columnName string, orderstr string) error {
+	if orderstr != "asc" && orderstr != "desc" {
+		return fmt.Errorf("not supported order keyword: %v", orderstr)
+	}
+	comparedFunc := func(p1, p2 *NewStructSelect) bool {
+		if columnName == "int_demo" {
+			return typeCompareFunc(p1.IntDemo, p2.IntDemo, orderstr)
+		} else if columnName == "text_demo" {
+			return typeCompareFunc(p1.TextDemo, p2.TextDemo, orderstr)
+		} else if columnName == "two_int" {
+			return typeCompareFunc(p1.TwoInt, p2.TwoInt, orderstr)
+		} else if columnName == "two_text" {
+			return typeCompareFunc(p1.TwoText, p2.TwoText, orderstr)
+		}
+		return typeCompareFunc(p1.IntDemo, p2.IntDemo, orderstr)
+	}
+	NewStructSelectBy(comparedFunc).Sort(c)
+	return nil
+}
+
+// NewStructSelectBy is the type of a "less" function that defines the ordering of its Planet arguments.
+type NewStructSelectBy func(p1, p2 *NewStructSelect) bool
+
+// Sort is a method on the function type, By, that sorts the argument slice according to the function.
+func (by NewStructSelectBy) Sort(newStructSelects []*NewStructSelect) {
+	ps := &newStructSelectSorter{
+		newStructSelects: newStructSelects,
+		by:               by, // The Sort method's receiver is the function (closure) that defines the sort order.
+	}
+	sort.Sort(ps)
+}
+
+// newStructSelectSorter joins a By function and a slice of Planets to be sorted.
+type newStructSelectSorter struct {
+	newStructSelects []*NewStructSelect
+	by               func(p1, p2 *NewStructSelect) bool // Closure used in the Less method.
+}
+
+// Len is part of sort.Interface.
+func (s *newStructSelectSorter) Len() int {
+	return len(s.newStructSelects)
+}
+
+// Swap is part of sort.Interface.
+func (s *newStructSelectSorter) Swap(i, j int) {
+	s.newStructSelects[i], s.newStructSelects[j] = s.newStructSelects[j], s.newStructSelects[i]
+}
+
+// Less is part of sort.Interface. It is implemented by calling the "by" closure in the sorter.
+func (s *newStructSelectSorter) Less(i, j int) bool {
+	return s.by(s.newStructSelects[i], s.newStructSelects[j])
 }
